@@ -6,45 +6,24 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics
 
 from measurement.models import Sensor, Measurement
-from measurement.serializers import SensorSerializer, MeasurementSerializer
+from measurement.serializers import SensorSerializer, MeasurementSerializer, SensorOneSerializer
 
 
-class SensorView(ListAPIView):
-
-    queryset = Sensor.objects.all()
-    serializer_class = SensorSerializer
-
-    def post(self, request):
-        sensor = Sensor.objects.all()
-        ser = SensorSerializer(data=request.data)
-        if ser.is_valid():
-            ser.save()
-            return Response(ser.data, status=status.HTTP_201_CREATED)
-        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class SensorOneView(RetrieveAPIView):
+class SensorView(generics.ListCreateAPIView): # Получение датчиков и создание
 
     queryset = Sensor.objects.all()
     serializer_class = SensorSerializer
 
-    def patch(self, request):
-        sensor = Sensor.objects.all()
-        ser = SensorSerializer(sensor, data=request.data)
-        if ser.is_valid():
-            ser.save()
-            return Response(ser.data)
-        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SensorOneView(generics.RetrieveUpdateAPIView): # Получение информации по датчику и обновление
+    queryset = Sensor.objects.all()
+    serializer_class = SensorOneSerializer
 
 
-class MeasurementsView(APIView):
+class MeasurementsView(generics.CreateAPIView): # Добавление измерения
 
-    def post(self, request):
-        measurement = Measurement.objects.all()
-        ser = MeasurementSerializer(data=request.data)
-        if ser.is_valid():
-            ser.save()
-            return Response(ser.data, status=status.HTTP_201_CREATED)
-        return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+    queryset = Measurement.objects.all()
+    serializer_class = MeasurementSerializer
